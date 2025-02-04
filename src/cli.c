@@ -24,9 +24,13 @@ void cli_exit(FILE *file)
     exit(0);
 }
 
-void cli_mkdir(char *nome)
+void cli_mkdir(char *comando)
 {
-    add_arquivo(arquivo_atual, nome);
+    if (strlen(comando) <= 6)
+    {
+        printf("Erro\n");
+    }
+    add_arquivo(arquivo_atual, comando);
 }
 
 void cli_ls()
@@ -37,6 +41,7 @@ void cli_ls()
 void init_cli(char *file_name)
 {
     char comando[257];
+    char message_comando[304];
     FILE *file = fopen(file_name, "rb+");
     int comando_length = 0;
 
@@ -72,9 +77,9 @@ void init_cli(char *file_name)
             cli_exit(file);
         }
 
-        if (!strncmp(comando, "mkdir", 5))
+        if (!strncmp(comando, "mkdir ", 6))
         {
-            cli_mkdir(trim(comando + 6));
+            cli_mkdir(comando);
             continue;
         }
 
@@ -83,5 +88,8 @@ void init_cli(char *file_name)
             cli_ls();
             continue;
         }
+
+        sprintf(message_comando, "comando \"%s\" nao encontrado", comando);
+        warning(message_comando);
     }
 }
