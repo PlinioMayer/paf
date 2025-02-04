@@ -22,13 +22,14 @@ typedef struct mem_arquivo_t
 typedef struct arquivo_info_t
 {
     char *nome;
-    char *path;
+    mem_arquivo_t *pai;
 } arquivo_info_t;
 
 extern mem_arquivo_t *arquivo_atual;
 
 mem_arquivo_t *add_root();
-mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, char *nome);
+mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, const char *nome);
+arquivo_info_t *obter_arquivo_info(const char *caminho);
 
 void print_arquivos();
 void free_arquivos();

@@ -27,7 +27,7 @@ mem_arquivo_t *add_root()
     return mem_arquivo;
 }
 
-mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, char *nome)
+mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, const char *nome)
 {
     mem_arquivo_t *mem_arquivo = calloc(1, sizeof(mem_arquivo_t));
     arquivo_t *arquivo = calloc(1, sizeof(arquivo_t));

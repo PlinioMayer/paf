@@ -3,7 +3,7 @@
 
 void cli_exit();
 void cli_flush();
-void cli_mkdir(char *nome);
+void cli_mkdir(const char *caminho);
 void cli_ls();
 void init_cli();
 

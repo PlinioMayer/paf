@@ -24,13 +24,15 @@ void cli_exit(FILE *file)
     exit(0);
 }
 
-void cli_mkdir(char *comando)
+void cli_mkdir(const char *nome)
 {
-    if (strlen(comando) <= 6)
+    if (!trim(nome))
     {
-        printf("Erro\n");
+        error("informe o nome do diretorio a ser criado");
+        return;
     }
-    add_arquivo(arquivo_atual, comando);
+
+    add_arquivo(arquivo_atual, trim(nome));
 }
 
 void cli_ls()
@@ -79,7 +81,13 @@ void init_cli(char *file_name)
 
         if (!strncmp(comando, "mkdir ", 6))
         {
-            cli_mkdir(comando);
+            cli_mkdir(comando + 6);
+            continue;
+        }
+
+        if (!strncmp(comando, "mkdir", 5))
+        {
+            error("informe o nome do diretorio a ser criado");
             continue;
         }
 

@@ -1,7 +1,11 @@
 #include "string.utils.h"
 #include <string.h>
+#include <stdlib.h>
 
-char *trim(char *str)
+char *trim(const char *str)
 {
-    return strtok(str, " \t\n\r");
+    char *temp = calloc(strlen(str), sizeof(char));
+    char *result;
+    strcpy(temp, str);
+    return strtok(temp, " \t\n\r");
 }
