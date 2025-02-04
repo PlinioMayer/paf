@@ -1,17 +1,18 @@
 # tool macros
 CXX := gcc
-CXXFLAGS :=
+CXXFLAGS := -Iinclude
 CCOBJFLAGS := $(CXXFLAGS) -c
 
 # path macros
 BIN_PATH := bin
 OBJ_PATH := obj
 SRC_PATH := src
+INCLUDE_PATH := include
 
-project_name := manfile
+PROJECT_NAME := manfile
 
 # compile macros
-TARGET_NAME := main
+TARGET_NAME := $(PROJECT_NAME)
 TARGET := $(BIN_PATH)/$(TARGET_NAME)
 
 # src files & obj files
@@ -34,18 +35,15 @@ $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c*
 	$(CXX) $(CCOBJFLAGS) -o $@ $<
 
 $(TARGET_DEBUG): $(OBJ_DEBUG)
-	$(CXX) $(CXXFLAGS) $(DBGFLAGS) $(OBJ_DEBUG) -o $@
+	$(CXX) $(CXXFLAGS) $(OBJ_DEBUG) -o $@
 
 # phony rules
 .PHONY: makedir
 makedir:
-	@mkdir -p $(BIN_PATH) $(OBJ_PATH) $(DBG_PATH)
+	@mkdir -p $(BIN_PATH) $(OBJ_PATH)
 
 .PHONY: all
 all: $(TARGET)
-
-.PHONY: debug
-debug: $(TARGET_DEBUG)
 
 .PHONY: clean
 clean:
