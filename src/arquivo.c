@@ -40,10 +40,10 @@ mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, char *nome)
     mem_arquivo->filhos_count = 0;
     mem_arquivo->filhos = calloc(mem_arquivo->filhos_count, sizeof(mem_arquivo_t *));
 
-    arquivo_pai->filhos = realloc(arquivo_pai->filhos, arquivo_pai->filhos_count + 1);
+    arquivo_pai->filhos = realloc(arquivo_pai->filhos, (arquivo_pai->filhos_count + 1) * sizeof(mem_arquivo_t *));
     arquivo_pai->filhos[arquivo_pai->filhos_count++] = mem_arquivo;
 
-    arquivos = realloc(arquivos, arquivos_count + 1);
+    arquivos = realloc(arquivos, (arquivos_count + 1) * sizeof(mem_arquivo_t *));
     arquivos[arquivos_count++] = mem_arquivo;
 
     return mem_arquivo;
@@ -110,4 +110,13 @@ void print_arquivos()
         printf("#");
     }
     printf("#\n");
+}
+
+void free_arquivos()
+{
+    for (int i = 0; i < arquivos_count; i++)
+    {
+        free(arquivos[i]->arquivo);
+        free(arquivos[i]->filhos);
+    }
 }

@@ -1,6 +1,7 @@
 #include "arquivo.h"
 #include "cli.h"
 #include "log.h"
+#include "string.utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +18,9 @@ void cli_flush()
 
 void cli_exit(FILE *file)
 {
+    free_arquivos();
     fclose(file);
+    printf("Bye ^^\n");
     exit(0);
 }
 
@@ -49,10 +52,9 @@ void init_cli(char *file_name)
     mem_arquivo_t *root = add_root();
     arquivo_atual = root;
 
-    fclose(file);
-
     while (1)
     {
+        printf("manfile>");
         fgets(comando, 257, stdin);
         comando_length = strlen(comando);
         if (comando[comando_length - 1] == '\n')
@@ -72,7 +74,7 @@ void init_cli(char *file_name)
 
         if (!strncmp(comando, "mkdir", 5))
         {
-            cli_mkdir(comando + 6);
+            cli_mkdir(trim(comando + 6));
             continue;
         }
 
