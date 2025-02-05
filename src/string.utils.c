@@ -4,7 +4,7 @@
 
 char *trim(const char *str)
 {
-    char *temp, *result = NULL;
+    char *temp = NULL;
 
     if (!str)
     {

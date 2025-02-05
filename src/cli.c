@@ -25,14 +25,16 @@ void cli_exit(FILE *file)
 
 void cli_mkdir(const char *caminho)
 {
-    if (!caminho || !trim(caminho))
+    char *trimmed = trim(caminho);
+
+    if (!trimmed || !strlen(trimmed))
     {
         error("informe o caminho do diretorio a ser criado");
         return;
     }
 
-    comando_info_t *comando_info = obter_comando_info(caminho);
-    add_arquivo(arquivo_atual, true, trim(caminho));
+    comando_info_t *comando_info = obter_comando_info(trimmed);
+    add_arquivo(comando_info->pai, true, comando_info->nome);
     free(comando_info->nome);
     free(comando_info);
 }

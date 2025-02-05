@@ -15,7 +15,7 @@ mem_arquivo_t *add_root()
     mem_arquivo_t *mem_arquivo = calloc(1, sizeof(mem_arquivo_t));
     arquivo_t *arquivo = calloc(1, sizeof(arquivo_t));
 
-    strncpy(arquivo->nome, "/", 256);
+    strcpy(arquivo->nome, "/");
     arquivo->diretorio = true;
 
     mem_arquivo->arquivo = arquivo;
@@ -34,8 +34,8 @@ mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, const bool diretorio, con
     mem_arquivo_t *mem_arquivo = calloc(1, sizeof(mem_arquivo_t));
     arquivo_t *arquivo = calloc(1, sizeof(arquivo_t));
 
-    strncpy(arquivo->nome, nome, 256);
-    strncpy(arquivo->pai, arquivo_pai->arquivo->nome, 256);
+    strncpy(arquivo->nome, nome, 255);
+    strncpy(arquivo->pai, arquivo_pai->arquivo->nome, 255);
     arquivo->diretorio = true;
 
     mem_arquivo->arquivo = arquivo;
@@ -101,13 +101,11 @@ mem_arquivo_t *buscar_arquivo(const char *caminho)
 
     if (!nome)
     {
-        free(trimmed);
         return arquivo;
     }
 
     if (!(arquivo = buscar_filho(arquivo, nome)))
     {
-        free(trimmed);
         return NULL;
     }
 
@@ -115,12 +113,10 @@ mem_arquivo_t *buscar_arquivo(const char *caminho)
     {
         if (!(arquivo = buscar_filho(arquivo, nome)))
         {
-            free(trimmed);
             return NULL;
         }
     }
 
-    free(trimmed);
     return arquivo;
 }
 
@@ -156,7 +152,6 @@ comando_info_t *obter_comando_info(const char *caminho)
 
         if (!comando_info->pai)
         {
-            free(trimmed);
             return NULL;
         }
 
@@ -165,7 +160,6 @@ comando_info_t *obter_comando_info(const char *caminho)
         comando_info->nome = nome;
     }
 
-    free(trimmed);
     return comando_info;
 }
 

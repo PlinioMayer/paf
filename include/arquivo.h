@@ -8,8 +8,8 @@
 
 typedef struct arquivo_t
 {
-    char nome[257];
-    char pai[257];
+    char nome[256];
+    char pai[256];
     bool diretorio;
 } arquivo_t;
 
