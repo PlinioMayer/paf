@@ -142,36 +142,23 @@ comando_info_t *obter_comando_info(const char *caminho)
         nome = calloc(trimmed_length + 1, sizeof(char));
         strcpy(nome, trimmed);
         comando_info->nome = nome;
-
-        free(trimmed);
-        return comando_info;
     }
-
-    if (!last_index)
+    else
     {
-        comando_info->pai = arquivos[0];
+        caminho_pai = calloc(last_index + 2, sizeof(char));
+        strncpy(caminho_pai, trimmed, last_index + 1);
+        comando_info->pai = buscar_arquivo(caminho_pai);
 
-        nome = calloc(trimmed_length, sizeof(char));
-        strcpy(nome, trimmed + 1);
+        if (!comando_info->pai)
+        {
+            free(trimmed);
+            return NULL;
+        }
+
+        nome = calloc(trimmed_length - last_index, sizeof(char));
+        strcpy(nome, trimmed + last_index + 1);
         comando_info->nome = nome;
-
-        free(trimmed);
-        return comando_info;
     }
-
-    caminho_pai = calloc(last_index + 1, sizeof(char));
-    strncpy(caminho_pai, trimmed, last_index);
-    comando_info->pai = buscar_arquivo(caminho_pai);
-
-    if (!comando_info->pai)
-    {
-        free(trimmed);
-        return NULL;
-    }
-
-    nome = calloc(trimmed_length - last_index, sizeof(char));
-    strcpy(nome, trimmed + last_index);
-    comando_info->nome = nome;
 
     free(trimmed);
     return comando_info;

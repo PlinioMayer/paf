@@ -33,6 +33,8 @@ void cli_mkdir(const char *caminho)
     }
 
     comando_info_t *comando_info = obter_comando_info(caminho);
+    printf("pai: %s\nnome: %s\n", comando_info->pai->arquivo->nome, comando_info->nome);
+    return;
 
     add_arquivo(arquivo_atual, trim(caminho));
 }
