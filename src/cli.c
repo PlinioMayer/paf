@@ -24,20 +24,30 @@ void cli_exit(FILE *file)
     exit(0);
 }
 
-void cli_mkdir(const char *nome)
+void cli_mkdir(const char *caminho)
 {
-    if (!trim(nome))
+    if (!caminho || !trim(caminho))
     {
-        error("informe o nome do diretorio a ser criado");
+        error("informe o caminho do diretorio a ser criado");
         return;
     }
 
-    add_arquivo(arquivo_atual, trim(nome));
+    comando_info_t *comando_info = obter_comando_info(caminho);
+
+    add_arquivo(arquivo_atual, trim(caminho));
 }
 
-void cli_ls()
+void cli_ls(char *caminho)
 {
-    print_arquivos();
+    mem_arquivo_t *mem_arquivo = buscar_arquivo(caminho);
+    if (mem_arquivo)
+    {
+        printf("nome: %s\n", mem_arquivo->arquivo->nome);
+    }
+    else
+    {
+        printf("nao encontrado\n");
+    }
 }
 
 void init_cli(char *file_name)
@@ -57,6 +67,9 @@ void init_cli(char *file_name)
     }
 
     mem_arquivo_t *root = add_root();
+    mem_arquivo_t *teste1 = add_arquivo(root, "teste1");
+    mem_arquivo_t *teste2 = add_arquivo(teste1, "teste2");
+    mem_arquivo_t *teste3 = add_arquivo(teste2, "teste3");
     arquivo_atual = root;
 
     while (1)
@@ -91,9 +104,15 @@ void init_cli(char *file_name)
             continue;
         }
 
+        if (!strncmp(comando, "ls ", 3))
+        {
+            cli_ls(comando + 3);
+            continue;
+        }
+
         if (!strcmp(comando, "ls"))
         {
-            cli_ls();
+            cli_ls(NULL);
             continue;
         }
 

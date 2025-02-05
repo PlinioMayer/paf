@@ -19,17 +19,19 @@ typedef struct mem_arquivo_t
     size_t filhos_count;
 } mem_arquivo_t;
 
-typedef struct arquivo_info_t
+typedef struct comando_info_t
 {
     char *nome;
     mem_arquivo_t *pai;
-} arquivo_info_t;
+} comando_info_t;
 
 extern mem_arquivo_t *arquivo_atual;
 
 mem_arquivo_t *add_root();
 mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, const char *nome);
-arquivo_info_t *obter_arquivo_info(const char *caminho);
+mem_arquivo_t *buscar_filho(const mem_arquivo_t *pai, const char *nome);
+mem_arquivo_t *buscar_arquivo(const char *caminho);
+comando_info_t *obter_comando_info(const char *caminho);
 
 void print_arquivos();
 void free_arquivos();

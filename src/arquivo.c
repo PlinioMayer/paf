@@ -1,4 +1,6 @@
 #include "arquivo.h"
+#include "string.utils.h"
+#include "log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,6 +49,132 @@ mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, const char *nome)
     arquivos[arquivos_count++] = mem_arquivo;
 
     return mem_arquivo;
+}
+
+mem_arquivo_t *buscar_filho(const mem_arquivo_t *pai, const char *nome)
+{
+    mem_arquivo_t *filho = NULL;
+    for (int i = 0; i < pai->filhos_count; i++)
+    {
+        if (!strcmp(pai->filhos[i]->arquivo->nome, nome))
+        {
+            filho = pai->filhos[i];
+            break;
+        }
+    }
+    return filho;
+}
+
+mem_arquivo_t *buscar_arquivo(const char *caminho)
+{
+    mem_arquivo_t *arquivo = NULL;
+    char *trimmed, *nome;
+
+    trimmed = trim(caminho);
+
+    if (!trimmed || !strlen(trimmed))
+    {
+        return NULL;
+    }
+
+    arquivo = trimmed[0] == '/' ? arquivos[0] : arquivo_atual;
+    nome = strtok(trimmed, "/");
+
+    while (nome)
+    {
+        if (!strcmp(nome, "."))
+            continue;
+
+        if (!strcmp(nome, ".."))
+        {
+            arquivo = arquivo->pai;
+            continue;
+        }
+
+        break;
+    }
+
+    if (!nome)
+    {
+        free(trimmed);
+        return arquivo;
+    }
+
+    if (!(arquivo = buscar_filho(arquivo, nome)))
+    {
+        free(trimmed);
+        return NULL;
+    }
+
+    while (nome = strtok(NULL, "/"))
+    {
+        if (!(arquivo = buscar_filho(arquivo, nome)))
+        {
+            free(trimmed);
+            return NULL;
+        }
+    }
+
+    free(trimmed);
+    return arquivo;
+}
+
+comando_info_t *obter_comando_info(const char *caminho)
+{
+    char *trimmed, *caminho_pai, *nome;
+    comando_info_t *comando_info = calloc(1, sizeof(comando_info_t));
+    int last_index = -1;
+    size_t trimmed_length;
+
+    trimmed = trim(caminho);
+
+    if (!trimmed || !(trimmed_length = strlen(trimmed)))
+    {
+        return NULL;
+    }
+
+    last_index = last_index_of(trimmed, '/');
+
+    if (last_index < 0)
+    {
+        comando_info->pai = arquivo_atual;
+
+        nome = calloc(trimmed_length + 1, sizeof(char));
+        strcpy(nome, trimmed);
+        comando_info->nome = nome;
+
+        free(trimmed);
+        return comando_info;
+    }
+
+    if (!last_index)
+    {
+        comando_info->pai = arquivos[0];
+
+        nome = calloc(trimmed_length, sizeof(char));
+        strcpy(nome, trimmed + 1);
+        comando_info->nome = nome;
+
+        free(trimmed);
+        return comando_info;
+    }
+
+    caminho_pai = calloc(last_index + 1, sizeof(char));
+    strncpy(caminho_pai, trimmed, last_index);
+    comando_info->pai = buscar_arquivo(caminho_pai);
+
+    if (!comando_info->pai)
+    {
+        free(trimmed);
+        return NULL;
+    }
+
+    nome = calloc(trimmed_length - last_index, sizeof(char));
+    strcpy(nome, trimmed + last_index);
+    comando_info->nome = nome;
+
+    free(trimmed);
+    return comando_info;
 }
 
 void print_arquivos()
@@ -119,4 +247,6 @@ void free_arquivos()
         free(arquivos[i]->arquivo);
         free(arquivos[i]->filhos);
     }
+
+    free(arquivos);
 }
