@@ -3,7 +3,6 @@
 #include "log.h"
 #include "string.utils.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 void cli_flush()
@@ -33,29 +32,32 @@ void cli_mkdir(const char *caminho)
     }
 
     comando_info_t *comando_info = obter_comando_info(caminho);
-    printf("pai: %s\nnome: %s\n", comando_info->pai->arquivo->nome, comando_info->nome);
-    return;
-
-    add_arquivo(arquivo_atual, trim(caminho));
+    add_arquivo(arquivo_atual, true, trim(caminho));
+    free(comando_info->nome);
+    free(comando_info);
 }
 
 void cli_ls(char *caminho)
 {
-    mem_arquivo_t *mem_arquivo = buscar_arquivo(caminho);
-    if (mem_arquivo)
+    uint64_t i = 0;
+    mem_arquivo_t *mem_arquivo = caminho ? buscar_arquivo(caminho) : arquivo_atual;
+
+    if (!mem_arquivo)
     {
-        printf("nome: %s\n", mem_arquivo->arquivo->nome);
+        warning("arquivo nao encontrado");
+        return;
     }
-    else
+
+    for (i = 0; i < mem_arquivo->filhos_count; i++)
     {
-        printf("nao encontrado\n");
+        char *tipo = mem_arquivo->filhos[i]->arquivo->diretorio ? "[diretorio]" : "[arquivo]  ";
+        printf("%s %s\n", tipo, mem_arquivo->filhos[i]->arquivo->nome);
     }
 }
 
 void init_cli(char *file_name)
 {
-    char comando[257];
-    char message_comando[304];
+    char comando[256];
     FILE *file = fopen(file_name, "rb+");
     int comando_length = 0;
 
@@ -68,16 +70,12 @@ void init_cli(char *file_name)
         file = fopen(file_name, "rb+");
     }
 
-    mem_arquivo_t *root = add_root();
-    mem_arquivo_t *teste1 = add_arquivo(root, "teste1");
-    mem_arquivo_t *teste2 = add_arquivo(teste1, "teste2");
-    mem_arquivo_t *teste3 = add_arquivo(teste2, "teste3");
-    arquivo_atual = root;
+    arquivo_atual = add_root();
 
     while (1)
     {
         printf("manfile>");
-        fgets(comando, 257, stdin);
+        fgets(comando, 255, stdin);
         comando_length = strlen(comando);
         if (comando[comando_length - 1] == '\n')
         {
@@ -85,7 +83,7 @@ void init_cli(char *file_name)
         }
         else
         {
-            warning("comando ultrapassou 256 caracteres");
+            warning("comando ultrapassou 255 caracteres");
             cli_flush();
         }
 
@@ -118,7 +116,6 @@ void init_cli(char *file_name)
             continue;
         }
 
-        sprintf(message_comando, "comando \"%s\" nao encontrado", comando);
-        warning(message_comando);
+        warning("comando nao encontrado");
     }
 }
