@@ -9,8 +9,8 @@
 typedef struct arquivo_t
 {
     char nome[256];
-    char pai[256];
     bool diretorio;
+    uint64_t filhos_count;
 } arquivo_t;
 
 typedef struct mem_arquivo_t
@@ -18,7 +18,6 @@ typedef struct mem_arquivo_t
     arquivo_t *arquivo;
     struct mem_arquivo_t *pai;
     struct mem_arquivo_t **filhos;
-    uint64_t filhos_count;
 } mem_arquivo_t;
 
 typedef struct comando_info_t
@@ -28,8 +27,9 @@ typedef struct comando_info_t
 } comando_info_t;
 
 extern mem_arquivo_t *arquivo_atual;
+extern mem_arquivo_t *root;
 
-mem_arquivo_t *add_root();
+void add_root();
 mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, const bool diretorio, const char *nome);
 mem_arquivo_t *buscar_filho(const mem_arquivo_t *pai, const char *nome);
 mem_arquivo_t *buscar_arquivo(const char *caminho);
