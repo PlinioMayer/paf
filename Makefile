@@ -9,7 +9,7 @@ OBJ_PATH := obj
 SRC_PATH := src
 INCLUDE_PATH := include
 
-PROJECT_NAME := manfile
+PROJECT_NAME := x-file
 
 # compile macros
 TARGET_NAME := $(PROJECT_NAME)
