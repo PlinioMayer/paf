@@ -6,44 +6,57 @@
 #include <string.h>
 #include <stdint.h>
 
-static uint64_t arquivos_count = 0;
-static mem_arquivo_t **arquivos = NULL;
 mem_arquivo_t *root = NULL;
 mem_arquivo_t *arquivo_atual = NULL;
 
-void add_root()
+void init_arquivo()
 {
-    mem_arquivo_t *mem_arquivo = calloc(1, sizeof(mem_arquivo_t));
+    arquivo_atual = root = calloc(1, sizeof(mem_arquivo_t));
     arquivo_t *arquivo = calloc(1, sizeof(arquivo_t));
 
     strcpy(arquivo->nome, "/");
-    arquivo->diretorio = true;
-    arquivo->filhos_count = 0;
+    arquivo->diretorio = TRUE;
+    arquivo->pai = 0;
+    arquivo->proximo = 0;
 
-    mem_arquivo->arquivo = arquivo;
-    mem_arquivo->pai = NULL;
-    mem_arquivo->filhos = calloc(mem_arquivo->arquivo->filhos_count, sizeof(mem_arquivo_t *));
-
-    arquivos = calloc(1, sizeof(mem_arquivo_t *));
-    arquivos[arquivos_count++] = mem_arquivo;
-
-    root = mem_arquivo;
+    arquivo_atual->endereco;
+    arquivo_atual->filhos_count = 0;
+    arquivo_atual->arquivo = arquivo;
+    arquivo_atual->pai = NULL;
+    arquivo_atual->filhos = calloc(arquivo_atual->filhos_count, sizeof(mem_arquivo_t *));
 }
 
-mem_arquivo_t *add_arquivo(mem_arquivo_t *arquivo_pai, const bool diretorio, const char *nome)
+void free_arquivo(mem_arquivo_t *mem_arquivo)
+{
+    uint64_t i = 0;
+    for (i = 0; i < mem_arquivo->filhos_count; i++)
+    {
+        free_arquivo(mem_arquivo->filhos[i]);
+    }
+
+    free(mem_arquivo->arquivo);
+    free(mem_arquivo->filhos);
+    free(mem_arquivo);
+}
+
+mem_arquivo_t *add_diretorio(mem_arquivo_t *pai, const char *nome)
 {
     mem_arquivo_t *mem_arquivo = calloc(1, sizeof(mem_arquivo_t));
     arquivo_t *arquivo = calloc(1, sizeof(arquivo_t));
 
     strncpy(arquivo->nome, nome, 255);
-    arquivo->diretorio = true;
-    arquivo->filhos_count = 0;
+    arquivo->diretorio = TRUE;
+    arquivo->pai = pai->endereco;
+    arquivo->proximo = 0;
 
+    mem_arquivo->endereco = escrever(arquivo);
+    mem_arquivo->filhos_count = 0;
     mem_arquivo->arquivo = arquivo;
-    mem_arquivo->pai = arquivo_pai;
-    mem_arquivo->filhos = calloc(mem_arquivo->arquivo->filhos_count, sizeof(mem_arquivo_t *));
-    arquivo_pai->filhos = realloc(arquivo_pai->filhos, (arquivo_pai->arquivo->filhos_count + 1) * sizeof(mem_arquivo_t *));
-    arquivo_pai->filhos[arquivo_pai->arquivo->filhos_count++] = mem_arquivo;
+    mem_arquivo->pai = pai;
+    mem_arquivo->filhos = calloc(mem_arquivo->filhos_count, sizeof(mem_arquivo_t *));
+
+    pai->filhos = realloc(pai->filhos, (pai->filhos_count + 1) * sizeof(mem_arquivo_t *));
+    pai->filhos[pai->filhos_count++] = mem_arquivo;
 
     return mem_arquivo;
 }
@@ -52,7 +65,7 @@ mem_arquivo_t *buscar_filho(const mem_arquivo_t *pai, const char *nome)
 {
     uint64_t i = 0;
     mem_arquivo_t *filho = NULL;
-    for (i = 0; i < pai->arquivo->filhos_count; i++)
+    for (i = 0; i < pai->filhos_count; i++)
     {
         if (!strcmp(pai->filhos[i]->arquivo->nome, nome))
         {
@@ -75,7 +88,7 @@ mem_arquivo_t *buscar_arquivo(const char *caminho)
         return NULL;
     }
 
-    arquivo = trimmed[0] == '/' ? arquivos[0] : arquivo_atual;
+    arquivo = trimmed[0] == '/' ? root : arquivo_atual;
     nome = strtok(trimmed, "/");
 
     while (nome)
@@ -160,78 +173,66 @@ comando_info_t *obter_comando_info(const char *caminho)
     return comando_info;
 }
 
-void print_arquivos()
-{
-    int8_t i, j = 0;
-    for (i = 0; i < 50; i++)
-    {
-        printf("#");
-    }
+// void print_arquivos()
+// {
+//     int8_t i, j = 0;
+//     for (i = 0; i < 50; i++)
+//     {
+//         printf("#");
+//     }
 
-    printf("#\n");
-    printf("#");
+//     printf("#\n");
+//     printf("#");
 
-    for (i = 0; i < 49; i++)
-    {
-        printf(" ");
-    }
+//     for (i = 0; i < 49; i++)
+//     {
+//         printf(" ");
+//     }
 
-    printf("#\n");
+//     printf("#\n");
 
-    printf("# nome: %s", arquivos[0]->arquivo->nome);
+//     printf("# nome: %s", root->arquivo->nome);
 
-    for (j = strlen(arquivos[0]->arquivo->nome); j < 42; j++)
-    {
-        printf(" ");
-    }
+//     for (j = strlen(root->arquivo->nome); j < 42; j++)
+//     {
+//         printf(" ");
+//     }
 
-    printf("#\n");
+//     printf("#\n");
 
-    for (i = 1; i < arquivos_count; i++)
-    {
-        printf("#");
+//     for (i = 1; i < arquivos_count; i++)
+//     {
+//         printf("#");
 
-        for (j = 0; j < 49; j++)
-        {
-            printf("-");
-        }
+//         for (j = 0; j < 49; j++)
+//         {
+//             printf("-");
+//         }
 
-        printf("#\n");
+//         printf("#\n");
 
-        printf("# pai: %s", arquivos[i]->pai->arquivo->nome);
+//         printf("# pai: %s", arquivos[i]->pai->arquivo->nome);
 
-        for (j = strlen(arquivos[i]->pai->arquivo->nome); j < 43; j++)
-        {
-            printf(" ");
-        }
+//         for (j = strlen(arquivos[i]->pai->arquivo->nome); j < 43; j++)
+//         {
+//             printf(" ");
+//         }
 
-        printf("#\n");
+//         printf("#\n");
 
-        printf("# nome: %s", arquivos[i]->arquivo->nome);
+//         printf("# nome: %s", arquivos[i]->arquivo->nome);
 
-        for (j = strlen(arquivos[i]->arquivo->nome); j < 42; j++)
-        {
-            printf(" ");
-        }
+//         for (j = strlen(arquivos[i]->arquivo->nome); j < 42; j++)
+//         {
+//             printf(" ");
+//         }
 
-        printf("#\n");
-    }
+//         printf("#\n");
+//     }
 
-    for (i = 0; i < 50; i++)
-    {
-        printf("#");
-    }
-    printf("#\n");
-}
-
-void free_arquivos()
-{
-    uint64_t i = 0;
-    for (i = 0; i < arquivos_count; i++)
-    {
-        free(arquivos[i]->arquivo);
-        free(arquivos[i]->filhos);
-    }
-
-    free(arquivos);
-}
+//     for (i = 0; i < 50; i++)
+//     {
+//         printf("#");
+//     }
+//     printf("#\n");
+// }

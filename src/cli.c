@@ -15,10 +15,10 @@ void cli_flush()
     }
 }
 
-void cli_exit(FILE *file)
+void cli_exit()
 {
-    free_arquivos();
-    fclose(file);
+    free_arquivo(root);
+    free_io();
     printf("Bye ^^\n");
     exit(0);
 }
@@ -42,7 +42,7 @@ void cli_mkdir(const char *caminho)
 
     if (strlen(comando_info->nome))
     {
-        add_arquivo(comando_info->pai, true, comando_info->nome);
+        add_diretorio(comando_info->pai, comando_info->nome);
     }
     else
     {
@@ -63,7 +63,7 @@ void cli_ls(char *caminho)
         return;
     }
 
-    for (i = 0; i < mem_arquivo->arquivo->filhos_count; i++)
+    for (i = 0; i < mem_arquivo->filhos_count; i++)
     {
         char *tipo = mem_arquivo->filhos[i]->arquivo->diretorio ? "[diretorio]" : "[arquivo]  ";
         printf("%s %s\n", tipo, mem_arquivo->filhos[i]->arquivo->nome);
@@ -118,19 +118,10 @@ void cli_pwd()
 void init_cli(char *file_name)
 {
     char comando[256];
-    FILE *file = fopen(file_name, "rb+");
     int comando_length = 0;
 
-    if (file == NULL)
-    {
-        file = fopen(file_name, "wb");
-        fclose(file);
-        file = fopen(file_name, "rb+");
-    }
-
-    add_root();
-    arquivo_atual = root;
-
+    init_io(file_name);
+    init_arquivo();
     cli_clear();
 
     while (1)
@@ -150,7 +141,7 @@ void init_cli(char *file_name)
 
         if (!strcmp(comando, "exit"))
         {
-            cli_exit(file);
+            cli_exit();
         }
 
         if (!strcmp(comando, "clear"))
