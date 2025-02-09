@@ -1,14 +1,14 @@
 #ifndef ARQUIVO_H
 #define ARQUIVO_H
-#define TRUE 1
-#define FALSE 0
 
 #include <stdlib.h>
 #include <stdint.h>
 #include "io.h"
+#include "boolean.h"
 
 typedef struct mem_arquivo_t
 {
+    uint8_t diretorio;
     uint64_t endereco;
     uint64_t filhos_count;
     arquivo_t *arquivo;

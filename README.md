@@ -4,5 +4,5 @@ Um gerenciador de arquivos de sistema com gostinho de Plínio.
 
 ## Tamanhos
 
-- Metadata: 273 bytes
-- Data: 727 bytes
+- Metadata: 272 bytes
+- Data: 31.728 bytes
