@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void cli_flush()
+static void cli_flush()
 {
     char c = '\0';
 
@@ -15,7 +15,7 @@ void cli_flush()
     }
 }
 
-void cli_exit()
+static void cli_exit()
 {
     free_arquivo(root);
     free_io();
@@ -23,22 +23,22 @@ void cli_exit()
     exit(0);
 }
 
-void cli_clear()
+static void cli_clear()
 {
     system("clear");
 }
 
-void cli_mkdir(const char *caminho)
+static void cli_mkdir(const char *parametros)
 {
-    char *trimmed = trim(caminho);
+    char *caminho = obter_parametros(parametros);
 
-    if (!trimmed || !strlen(trimmed))
+    if (!caminho || !strlen(caminho))
     {
         error("informe o caminho do diretorio a ser criado");
         return;
     }
 
-    comando_info_t *comando_info = obter_comando_info(trimmed);
+    comando_info_t *comando_info = obter_comando_info(caminho);
 
     if (strlen(comando_info->nome))
     {
@@ -52,8 +52,9 @@ void cli_mkdir(const char *caminho)
     free(comando_info);
 }
 
-void cli_ls(char *caminho)
+static void cli_ls(char *parametros)
 {
+    char *caminho = obter_parametros(parametros);
     uint64_t i = 0;
     mem_arquivo_t *mem_arquivo = caminho ? buscar_arquivo(caminho) : arquivo_atual;
 
@@ -70,8 +71,9 @@ void cli_ls(char *caminho)
     }
 }
 
-void cli_cd(char *caminho)
+static void cli_cd(char *parametros)
 {
+    char *caminho = obter_parametros(parametros);
     mem_arquivo_t *temp_mem_arquivo = buscar_arquivo(caminho);
 
     if (!temp_mem_arquivo)
@@ -89,7 +91,7 @@ void cli_cd(char *caminho)
     arquivo_atual = temp_mem_arquivo;
 }
 
-void cli_pwd()
+static void cli_pwd()
 {
     char *caminho = calloc(1, sizeof(char));
     char *caminho_atual = calloc(1, sizeof(char));
@@ -122,7 +124,7 @@ void init_cli(char *file_name)
 
     init_io(file_name);
     init_arquivo();
-    // cli_clear();
+    cli_clear();
 
     while (1)
     {

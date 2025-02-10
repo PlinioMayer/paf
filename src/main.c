@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "cli.h"
-#include "log.h"
 
 int main(int argc, char **args)
 {

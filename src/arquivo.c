@@ -117,17 +117,12 @@ mem_arquivo_t *buscar_filho(const mem_arquivo_t *pai, const char *nome)
 mem_arquivo_t *buscar_arquivo(const char *caminho)
 {
     mem_arquivo_t *arquivo = NULL;
-    char *trimmed, *nome;
+    char *nome = NULL, *temp = calloc(strlen(caminho) + 1, sizeof(char));
 
-    trimmed = trim(caminho);
+    strcpy(temp, caminho);
 
-    if (!trimmed || !strlen(trimmed))
-    {
-        return NULL;
-    }
-
-    arquivo = trimmed[0] == '/' ? root : arquivo_atual;
-    nome = strtok(trimmed, "/");
+    arquivo = caminho[0] == '/' ? root : arquivo_atual;
+    nome = strtok(temp, "/");
 
     while (nome)
     {
@@ -170,30 +165,25 @@ mem_arquivo_t *buscar_arquivo(const char *caminho)
 
 comando_info_t *obter_comando_info(const char *caminho)
 {
-    char *trimmed = trim(caminho), *caminho_pai = NULL, *nome = NULL;
+    char *caminho_pai = NULL, *nome = NULL;
     comando_info_t *comando_info = calloc(1, sizeof(comando_info_t));
     int16_t last_index = -1;
-    uint8_t trimmed_length = 0;
+    uint8_t caminho_length = strlen(caminho);
 
-    if (!trimmed || !(trimmed_length = strlen(trimmed)))
-    {
-        return NULL;
-    }
-
-    last_index = last_index_of(trimmed, '/');
+    last_index = last_index_of(caminho, '/');
 
     if (last_index < 0)
     {
         comando_info->pai = arquivo_atual;
 
-        nome = calloc(trimmed_length + 1, sizeof(char));
-        strcpy(nome, trimmed);
+        nome = calloc(caminho_length + 1, sizeof(char));
+        strcpy(nome, caminho);
         comando_info->nome = nome;
     }
     else
     {
         caminho_pai = calloc(last_index + 2, sizeof(char));
-        strncpy(caminho_pai, trimmed, last_index + 1);
+        strncpy(caminho_pai, caminho, last_index + 1);
         comando_info->pai = buscar_arquivo(caminho_pai);
 
         if (!comando_info->pai)
@@ -201,8 +191,8 @@ comando_info_t *obter_comando_info(const char *caminho)
             return NULL;
         }
 
-        nome = calloc(trimmed_length - last_index, sizeof(char));
-        strcpy(nome, trimmed + last_index + 1);
+        nome = calloc(caminho_length - last_index, sizeof(char));
+        strcpy(nome, caminho + last_index + 1);
         comando_info->nome = nome;
     }
 
