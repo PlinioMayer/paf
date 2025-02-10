@@ -18,7 +18,7 @@ static void add_filho(mem_arquivo_t *pai, mem_arquivo_t *filho)
 void init_arquivo()
 {
     mem_arquivo_t **mem_arquivos = calloc(0, sizeof(mem_arquivo_t *));
-    uint64_t i = 0, j = 0, mem_arquivos_count = 0;
+    uint64_t i = 0, j = 0, min = 0, max = 0, mem_arquivos_count = 0;
     flag_t *flag = NULL;
 
     while (flag = ler_flag())
@@ -30,7 +30,6 @@ void init_arquivo()
         mem_arquivos[mem_arquivos_count]->filhos_count = 0;
         mem_arquivos[mem_arquivos_count]->arquivo = ler_arquivo();
         mem_arquivos[mem_arquivos_count]->filhos = calloc(mem_arquivos[mem_arquivos_count]->filhos_count, sizeof(mem_arquivo_t *));
-        // printf("nome: %s\nendereco: %lu\npai: %lu\n", mem_arquivos[mem_arquivos_count]->arquivo->nome, mem_arquivos[mem_arquivos_count]->endereco, mem_arquivos[mem_arquivos_count]->arquivo->pai);
         mem_arquivos_count++;
     }
 
@@ -44,10 +43,13 @@ void init_arquivo()
 
     for (i = 1; i < mem_arquivos_count; i++)
     {
-        j = mem_arquivos_count / 2;
+        min = 0;
+        max = mem_arquivos_count;
 
         while (TRUE)
         {
+            j = (min + max) / 2;
+
             if (mem_arquivos[j]->endereco == mem_arquivos[i]->arquivo->pai)
             {
                 mem_arquivos[i]->pai = mem_arquivos[j];
@@ -56,13 +58,9 @@ void init_arquivo()
             }
 
             if (mem_arquivos[i]->arquivo->pai < mem_arquivos[j]->endereco)
-            {
-                j /= 2;
-            }
+                max = j;
             else
-            {
-                j = (mem_arquivos_count + j) / 2;
-            }
+                min = j;
         }
     }
 }
