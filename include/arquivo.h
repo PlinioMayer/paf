@@ -8,7 +8,6 @@
 
 typedef struct mem_arquivo_t
 {
-    uint8_t diretorio;
     uint64_t endereco;
     uint64_t filhos_count;
     arquivo_t *arquivo;

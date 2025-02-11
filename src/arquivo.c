@@ -17,18 +17,17 @@ static void add_filho(mem_arquivo_t *pai, mem_arquivo_t *filho)
 
 void init_arquivo()
 {
+    arquivo_t *arquivo = NULL;
     mem_arquivo_t **mem_arquivos = calloc(0, sizeof(mem_arquivo_t *));
     uint64_t i = 0, j = 0, min = 0, max = 0, mem_arquivos_count = 0;
-    flag_t *flag = NULL;
 
-    while (flag = ler_flag())
+    while (arquivo = ler_prox_arquivo())
     {
         mem_arquivos = realloc(mem_arquivos, sizeof(mem_arquivo_t *) * (mem_arquivos_count + 1));
         mem_arquivos[mem_arquivos_count] = calloc(1, sizeof(mem_arquivo_t));
-        mem_arquivos[mem_arquivos_count]->diretorio = flag->diretorio;
-        mem_arquivos[mem_arquivos_count]->endereco = ultimo_endereco - 1;
+        mem_arquivos[mem_arquivos_count]->endereco = ultimo_endereco - ARQUIVO_SIZE;
+        mem_arquivos[mem_arquivos_count]->arquivo = arquivo;
         mem_arquivos[mem_arquivos_count]->filhos_count = 0;
-        mem_arquivos[mem_arquivos_count]->arquivo = ler_arquivo();
         mem_arquivos[mem_arquivos_count]->filhos = calloc(mem_arquivos[mem_arquivos_count]->filhos_count, sizeof(mem_arquivo_t *));
         mem_arquivos_count++;
     }
@@ -85,9 +84,11 @@ mem_arquivo_t *add_diretorio(mem_arquivo_t *pai, const char *nome)
 
     strncpy(arquivo->nome, nome, 256);
     arquivo->pai = pai ? pai->endereco : 0;
+    arquivo->diretorio = TRUE;
 
-    mem_arquivo->endereco = escrever(TRUE, arquivo);
-    mem_arquivo->diretorio = TRUE;
+    escrever(arquivo);
+
+    mem_arquivo->endereco = ultimo_endereco - ARQUIVO_SIZE;
     mem_arquivo->filhos_count = 0;
     mem_arquivo->arquivo = arquivo;
     mem_arquivo->pai = pai;

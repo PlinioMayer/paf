@@ -1,6 +1,7 @@
 #include "io.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "boolean.h"
 
 uint64_t ultimo_endereco = 0;
 
@@ -24,31 +25,48 @@ void free_io()
 flag_t *ler_flag()
 {
     flag_t *flag = NULL;
-    uint8_t diretorio = 0;
-    if (fread(&diretorio, 1, 1, file))
+    uint8_t arquivo = 0;
+    if (fread(&arquivo, 1, 1, file))
     {
         flag = calloc(1, sizeof(flag_t));
         flag->lixo = 0;
-        flag->diretorio = diretorio & (uint8_t)1;
+        flag->arquivo = arquivo & (uint8_t)1;
         ultimo_endereco += FLAG_SIZE;
     }
     return flag;
 }
 
-arquivo_t *ler_arquivo()
+arquivo_t *ler_prox_arquivo()
 {
-    arquivo_t *arquivo = calloc(1, sizeof(arquivo_t));
-    fread(arquivo, sizeof(arquivo_t), 1, file);
-    ultimo_endereco += ARQUIVO_SIZE;
+
+    flag_t *flag = NULL;
+    arquivo_t *arquivo = NULL;
+
+    while (TRUE)
+    {
+        if (!(flag = ler_flag()))
+            return NULL;
+
+        if (!flag->arquivo)
+        {
+            fseek(file, DATA_SIZE, SEEK_CUR);
+            ultimo_endereco += DATA_SIZE;
+            continue;
+        }
+
+        arquivo = calloc(1, sizeof(arquivo_t));
+        fread(arquivo, sizeof(arquivo_t), 1, file);
+        ultimo_endereco += ARQUIVO_SIZE;
+        break;
+    }
+
     return arquivo;
 }
 
-uint64_t escrever(const uint8_t diretorio, const arquivo_t *arquivo)
+void escrever(const arquivo_t *arquivo)
 {
-    uint64_t endereco_atual = ultimo_endereco;
-    fwrite(&diretorio, 1, 1, file);
+    fwrite(&(int){1}, 1, 1, file);
     ultimo_endereco += FLAG_SIZE;
     fwrite(arquivo, sizeof(arquivo_t), 1, file);
     ultimo_endereco += ARQUIVO_SIZE;
-    return endereco_atual;
 }

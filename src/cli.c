@@ -66,7 +66,7 @@ static void cli_ls(char *parametros)
 
     for (i = 0; i < mem_arquivo->filhos_count; i++)
     {
-        char *tipo = mem_arquivo->filhos[i]->diretorio ? "[diretorio]" : "[arquivo]  ";
+        char *tipo = mem_arquivo->filhos[i]->arquivo->diretorio ? "[diretorio]" : "[arquivo]  ";
         printf("%s %s\n", tipo, mem_arquivo->filhos[i]->arquivo->nome);
     }
 }
@@ -82,7 +82,7 @@ static void cli_cd(char *parametros)
         return;
     }
 
-    if (!temp_mem_arquivo->diretorio)
+    if (!temp_mem_arquivo->arquivo->diretorio)
     {
         error("arquivo nao e um diretorio");
         return;
@@ -124,7 +124,7 @@ void init_cli(char *file_name)
 
     init_io(file_name);
     init_arquivo();
-    cli_clear();
+    // cli_clear();
 
     while (1)
     {
