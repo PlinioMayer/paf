@@ -25,7 +25,7 @@ void init_arquivo()
     {
         mem_arquivos = realloc(mem_arquivos, sizeof(mem_arquivo_t *) * (mem_arquivos_count + 1));
         mem_arquivos[mem_arquivos_count] = calloc(1, sizeof(mem_arquivo_t));
-        mem_arquivos[mem_arquivos_count]->endereco = ultimo_endereco - ARQUIVO_SIZE;
+        mem_arquivos[mem_arquivos_count]->endereco = file_pointer - FLAG_SIZE - ARQUIVO_SIZE;
         mem_arquivos[mem_arquivos_count]->arquivo = arquivo;
         mem_arquivos[mem_arquivos_count]->filhos_count = 0;
         mem_arquivos[mem_arquivos_count]->filhos = calloc(mem_arquivos[mem_arquivos_count]->filhos_count, sizeof(mem_arquivo_t *));
@@ -88,7 +88,7 @@ mem_arquivo_t *add_diretorio(mem_arquivo_t *pai, const char *nome)
 
     escrever(arquivo);
 
-    mem_arquivo->endereco = ultimo_endereco - ARQUIVO_SIZE;
+    mem_arquivo->endereco = file_pointer - FLAG_SIZE - ARQUIVO_SIZE;
     mem_arquivo->filhos_count = 0;
     mem_arquivo->arquivo = arquivo;
     mem_arquivo->pai = pai;
