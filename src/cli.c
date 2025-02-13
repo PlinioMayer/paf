@@ -54,6 +54,12 @@ static void cli_mkdir(const char *parametros)
 
     comando_info_t *comando_info = obter_comando_info(caminho);
 
+    if (!comando_info)
+    {
+        error("caminho nao encontrado");
+        return;
+    }
+
     if (!strlen(comando_info->nome))
     {
         error("tentando recriar a pasta /, serio?");
@@ -166,6 +172,12 @@ static void cli_touch(const char *parametros)
     }
 
     comando_info_t *comando_info = obter_comando_info(caminho);
+
+    if (!comando_info)
+    {
+        error("caminho nao encontrado");
+        return;
+    }
 
     if (!strlen(comando_info->nome))
     {
