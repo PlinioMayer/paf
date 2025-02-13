@@ -1,4 +1,4 @@
-#include "arquivo.h"
+#include "memoria.h"
 #include "cli.h"
 #include "log.h"
 #include "string.utils.h"
@@ -35,6 +35,7 @@ static void cli_help()
     printf("rm    [/]<caminho>        remove o diretorio em <caminho>\n");
     printf("touch [/][caminho/]<nome> cria um arquivo chamado <nome> no [caminho]\n");
     printf("\ncaminhos iniciados com / sao tratados como caminhos absolutos a partir do diretorio raiz.\n");
+    printf("comandos com espaco podem ser executados utilizando aspas duplas\nEx.: cd \"pasta/nome com espaco\".\n");
 }
 
 static void cli_clear()

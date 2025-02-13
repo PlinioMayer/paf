@@ -1,13 +1,12 @@
 # tool macros
 CXX := gcc
-CXXFLAGS := -Iinclude
+CXXFLAGS := -Iinclude -std=c99
 CCOBJFLAGS := $(CXXFLAGS) -c
 
 # path macros
 BIN_PATH := bin
 OBJ_PATH := obj
 SRC_PATH := src
-INCLUDE_PATH := include
 
 PROJECT_NAME := paf
 

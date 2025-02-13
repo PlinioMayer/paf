@@ -1,4 +1,4 @@
-#include "arquivo.h"
+#include "memoria.h"
 #include "string.utils.h"
 #include "log.h"
 #include <stdio.h>
@@ -131,12 +131,8 @@ void remover_arquivo(mem_arquivo_t *mem_arquivo)
 {
     uint64_t i = 0;
 
-    free(mem_arquivo->arquivo->atributos);
-    free(mem_arquivo->arquivo);
-    remover(mem_arquivo->endereco);
-
-    for (i = 0; i < mem_arquivo->filhos_count; i++)
-        remover_arquivo(mem_arquivo->filhos[i]);
+    while (mem_arquivo->filhos_count)
+        remover_arquivo(mem_arquivo->filhos[0]);
 
     for (i = 0; i < mem_arquivo->pai->filhos_count; i++)
     {
@@ -151,8 +147,10 @@ void remover_arquivo(mem_arquivo_t *mem_arquivo)
         mem_arquivo->pai->filhos[i - 1] = mem_arquivo->pai->filhos[i];
 
     mem_arquivo->pai->filhos_count--;
+    mem_arquivo->pai->filhos = realloc(mem_arquivo->pai->filhos, mem_arquivo->pai->filhos_count * sizeof(mem_arquivo_t *));
 
-    free(mem_arquivo);
+    remover(mem_arquivo->endereco);
+    free_arquivo(mem_arquivo);
 }
 
 mem_arquivo_t *buscar_filho(const mem_arquivo_t *pai, const char *nome)
