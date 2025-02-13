@@ -40,14 +40,23 @@ static void cli_mkdir(const char *parametros)
 
     comando_info_t *comando_info = obter_comando_info(caminho);
 
-    if (strlen(comando_info->nome))
-    {
-        add_diretorio(comando_info->pai, comando_info->nome);
-    }
-    else
+    if (!strlen(comando_info->nome))
     {
         error("tentando recriar a pasta /, serio?");
+        free(comando_info->nome);
+        free(comando_info);
+        return;
     }
+
+    if (buscar_filho(comando_info->pai, comando_info->nome))
+    {
+        error("arquivo já existe");
+        free(comando_info->nome);
+        free(comando_info);
+        return;
+    }
+
+    add_diretorio(comando_info->pai, comando_info->nome);
     free(comando_info->nome);
     free(comando_info);
 }
@@ -66,7 +75,7 @@ static void cli_ls(char *parametros)
 
     for (i = 0; i < mem_arquivo->filhos_count; i++)
     {
-        char *tipo = mem_arquivo->filhos[i]->arquivo->atributos->diretorio ? "[diretorio]" : "[arquivo]  ";
+        char *tipo = mem_arquivo->filhos[i]->arquivo->atributos->diretorio ? "[diretorio]" : "[ arquivo ]";
         printf("%s %s\n", tipo, mem_arquivo->filhos[i]->arquivo->nome);
     }
 }
@@ -129,6 +138,42 @@ static void cli_rm(char *parametros)
     }
 
     remover_arquivo(temp_mem_arquivo);
+}
+
+static void cli_touch(const char *parametros)
+{
+    char *caminho = obter_parametros(parametros);
+    atributos_t *atributos;
+
+    if (!caminho || !strlen(caminho))
+    {
+        error("informe o caminho do arquivo a ser criado");
+        return;
+    }
+
+    comando_info_t *comando_info = obter_comando_info(caminho);
+
+    if (!strlen(comando_info->nome))
+    {
+        error("um arquivo chamado /?");
+        free(comando_info->nome);
+        free(comando_info);
+        return;
+    }
+
+    if (buscar_filho(comando_info->pai, comando_info->nome))
+    {
+        error("arquivo já existe");
+        free(comando_info->nome);
+        free(comando_info);
+        return;
+    }
+
+    atributos = calloc(1, sizeof(atributos_t));
+    atributos->diretorio = FALSE;
+    add_arquivo(comando_info->pai, atributos, comando_info->nome);
+    free(comando_info->nome);
+    free(comando_info);
 }
 
 void init_cli(char *file_name)
@@ -217,6 +262,18 @@ void init_cli(char *file_name)
         if (!strcmp(comando, "rm"))
         {
             error("informe o nome do arquivo a ser removido");
+            continue;
+        }
+
+        if (!strncmp(comando, "touch ", 6))
+        {
+            cli_touch(comando + 6);
+            continue;
+        }
+
+        if (!strcmp(comando, "touch"))
+        {
+            error("informe o nome do arquivo a ser criado");
             continue;
         }
 

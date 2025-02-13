@@ -73,28 +73,41 @@ void free_arquivo(mem_arquivo_t *mem_arquivo)
         free_arquivo(mem_arquivo->filhos[i]);
     }
 
+    if (mem_arquivo->arquivo->atributos->diretorio)
+        free(mem_arquivo->filhos);
+
     free(mem_arquivo->arquivo->atributos);
     free(mem_arquivo->arquivo);
-    free(mem_arquivo->filhos);
     free(mem_arquivo);
 }
 
 mem_arquivo_t *add_diretorio(mem_arquivo_t *pai, const char *nome)
+{
+    atributos_t *atributos = calloc(1, sizeof(atributos_t));
+    mem_arquivo_t *mem_arquivo = NULL;
+
+    atributos->diretorio = TRUE;
+    mem_arquivo = add_arquivo(pai, atributos, nome);
+    mem_arquivo->filhos = calloc(mem_arquivo->filhos_count, sizeof(mem_arquivo_t *));
+
+    return mem_arquivo;
+}
+
+mem_arquivo_t *add_arquivo(mem_arquivo_t *pai, atributos_t *atributos, const char *nome)
 {
     mem_arquivo_t *mem_arquivo = calloc(1, sizeof(mem_arquivo_t));
     arquivo_t *arquivo = calloc(1, sizeof(arquivo_t));
 
     strncpy(arquivo->nome, nome, 256);
     arquivo->pai = pai ? pai->endereco : 0;
-    arquivo->atributos = calloc(1, sizeof(atributos_t));
-    arquivo->atributos->diretorio = TRUE;
+    arquivo->atributos = atributos;
 
     escrever(arquivo);
     mem_arquivo->endereco = get_file_pointer() - ARQUIVO_SIZE;
     mem_arquivo->filhos_count = 0;
     mem_arquivo->arquivo = arquivo;
     mem_arquivo->pai = pai;
-    mem_arquivo->filhos = calloc(mem_arquivo->filhos_count, sizeof(mem_arquivo_t *));
+    mem_arquivo->filhos = NULL;
 
     if (pai)
         add_filho(pai, mem_arquivo);

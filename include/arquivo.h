@@ -28,6 +28,7 @@ void init_arquivo();
 void free_arquivo();
 
 mem_arquivo_t *add_diretorio(mem_arquivo_t *pai, const char *nome);
+mem_arquivo_t *add_arquivo(mem_arquivo_t *pai, atributos_t *atributos_t, const char *nome);
 void remover_arquivo(mem_arquivo_t *mem_arquivo);
 mem_arquivo_t *buscar_filho(const mem_arquivo_t *pai, const char *nome);
 mem_arquivo_t *buscar_arquivo(const char *caminho);
