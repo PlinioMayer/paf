@@ -28,11 +28,11 @@ static void cli_help()
     printf("exit                      encerra o programa\n");
     printf("help                      exibe essa mensagem\n");
     printf("clear                     limpa o terminal\n");
-    printf("mkdir [/][caminho/]<nome> cria um diretorio chamado <nome> no [caminho]\n");
-    printf("ls [/][caminho]           lista os arquivos no diretorio em [caminho] ou diretorio atual se nao especificado\n");
-    printf("cd [/]<caminho>           altera diretorio atual por aquele especificado em <caminho>\n");
     printf("pwd                       imprime o caminho para o diretorio atual\n");
-    printf("rm [/]<caminho>           remove o diretorio em <caminho>\n");
+    printf("mkdir [/][caminho/]<nome> cria um diretorio chamado <nome> no [caminho]\n");
+    printf("ls    [/][caminho]        lista os arquivos no diretorio em [caminho] ou diretorio atual se nao especificado\n");
+    printf("cd    [/]<caminho>        altera diretorio atual por aquele especificado em <caminho>\n");
+    printf("rm    [/]<caminho>        remove o diretorio em <caminho>\n");
     printf("touch [/][caminho/]<nome> cria um arquivo chamado <nome> no [caminho]\n");
     printf("\ncaminhos iniciados com / sao tratados como caminhos absolutos a partir do diretorio raiz.\n");
 }
