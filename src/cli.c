@@ -124,7 +124,7 @@ void init_cli(char *file_name)
 
     init_io(file_name);
     init_arquivo();
-    // cli_clear();
+    cli_clear();
 
     while (1)
     {

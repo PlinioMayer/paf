@@ -10,17 +10,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef enum tipo_informacao
-{
-    DATA = 0,
-    ARQUIVO = 1
-} tipo_informacao;
-
 typedef struct flags_t
 {
-    uint8_t lixo : 6;
+    uint8_t lixo : 7;
     boolean usado : 1;
-    tipo_informacao tipo : 1;
 } flags_t;
 
 typedef struct atributos_t
