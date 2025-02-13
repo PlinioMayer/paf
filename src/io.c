@@ -202,7 +202,7 @@ arquivo_t *ler_prox_arquivo()
 
     if (!flags->usado)
     {
-        fseek(file, ARQUIVO_SIZE - FLAGS_SIZE - 1, SEEK_CUR);
+        fseek(file, ARQUIVO_SIZE - FLAGS_SIZE, SEEK_CUR);
         return ler_prox_arquivo();
     }
 
