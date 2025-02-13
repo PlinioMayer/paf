@@ -1,9 +1,9 @@
 #ifndef IO_H
 #define IO_H
-#define FLAGS_SIZE 1
-#define ENDERECO_SIZE 8
-#define ATRIBUTOS_SIZE 1
-#define NOME_SIZE 256
+#define FLAGS_SIZE (uint8_t)1
+#define ENDERECO_SIZE (uint8_t)8
+#define ATRIBUTOS_SIZE (uint8_t)1
+#define NOME_SIZE (uint16_t)256
 #define ARQUIVO_SIZE (FLAGS_SIZE + ENDERECO_SIZE + ATRIBUTOS_SIZE + NOME_SIZE)
 
 #include "boolean.h"
