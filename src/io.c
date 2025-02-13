@@ -3,43 +3,80 @@
 #include <stdlib.h>
 #include "boolean.h"
 
-uint64_t file_pointer = 0;
-
 FILE *file;
 
-static flag_t *ler_flag()
+static flags_t *ler_flags()
 {
-    flag_t *flag = NULL;
+    flags_t *flags = NULL;
     uint8_t bits = 0;
-    if (fread(&bits, 1, 1, file))
+    if (fread(&bits, FLAG_SIZE, 1, file))
     {
-        flag = calloc(1, sizeof(flag_t));
-        flag->lixo = 0;
-        flag->usado = (bits & (uint8_t)2) >> 1;
-        flag->tipo = bits & (uint8_t)1;
-        file_pointer += FLAG_SIZE;
+        flags = calloc(1, sizeof(flags_t));
+        flags->lixo = 0;
+        flags->usado = (bits & (uint8_t)2) >> 1;
+        flags->tipo = bits & (uint8_t)1;
     }
-    return flag;
+    return flags;
 }
 
-static void escrever_flag(const flag_t *flag)
+static void escrever_flags(const flags_t *flags)
 {
     uint8_t bits = 0;
 
-    if (flag->usado)
+    if (flags->usado)
         bits += 2;
 
-    if (flag->tipo)
+    if (flags->tipo)
         bits += 1;
 
     fwrite(&bits, FLAG_SIZE, 1, file);
-    file_pointer += FLAG_SIZE;
 }
 
-static void escrever_endereco(uint64_t endereco)
+static uint64_t ler_endereco()
+{
+    uint64_t endereco = 0;
+    fread(&endereco, ENDERECO_SIZE, 1, file);
+    return endereco;
+}
+
+static void escrever_endereco(const uint64_t endereco)
 {
     fwrite(&endereco, ENDERECO_SIZE, 1, file);
-    file_pointer += ENDERECO_SIZE;
+}
+
+static void ler_nome(char nome[NOME_SIZE])
+{
+    fread(nome, 1, NOME_SIZE, file);
+}
+
+static void escrever_nome(const char *nome)
+{
+    fwrite(nome, 1, NOME_SIZE, file);
+}
+
+static atributos_t *ler_atributos()
+{
+    atributos_t *atributos = NULL;
+    uint8_t bits = 0;
+
+    if (fread(&bits, ATRIBUTOS_SIZE, 1, file))
+    {
+        atributos = calloc(1, sizeof(atributos_t));
+        atributos->lixo = 0;
+        atributos->diretorio = bits & (uint8_t)1;
+    }
+
+    return atributos;
+}
+
+static void escrever_atributos(const atributos_t *atributos)
+{
+    uint8_t bits = 0;
+
+    if (atributos->diretorio)
+        bits += 1;
+
+    fwrite(&bits, ATRIBUTOS_SIZE, 1, file);
 }
 
 void init_io(char *file_name)
@@ -57,58 +94,33 @@ void free_io()
     fclose(file);
 }
 
+uint64_t get_file_pointer()
+{
+    return ftell(file);
+}
+
 arquivo_t *ler_prox_arquivo()
 {
-
-    flag_t *flag = NULL;
+    flags_t *flag = NULL;
     arquivo_t *arquivo = NULL;
 
-    while (TRUE)
-    {
-        if (!(flag = ler_flag()))
-            return NULL;
+    if (!(flag = ler_flags()))
+        return NULL;
 
-        if (!flag->tipo)
-        {
-            fseek(file, DATA_SIZE, SEEK_CUR);
-            file_pointer += DATA_SIZE;
-            continue;
-        }
-
-        arquivo = calloc(1, sizeof(arquivo_t));
-        fread(arquivo, sizeof(arquivo_t), 1, file);
-        file_pointer += ARQUIVO_SIZE;
-        break;
-    }
+    arquivo = calloc(1, sizeof(arquivo_t));
+    arquivo->pai = ler_endereco();
+    arquivo->atributos = ler_atributos();
+    ler_nome(arquivo->nome);
 
     return arquivo;
 }
 
 void escrever(const arquivo_t *arquivo)
 {
-    flag_t flag = {.usado = 1, .tipo = 1};
-    escrever_flag(&flag);
-    fwrite(arquivo, sizeof(arquivo_t), 1, file);
-    file_pointer += ARQUIVO_SIZE;
-}
+    flags_t flags = {.usado = 1, .tipo = 1};
 
-void escrever_conteudo(arquivo_t *arquivo, const uint64_t tamanho, const uint8_t *conteudo)
-{
-    flag_t flag = {.usado = 1, .tipo = 1};
-    uint64_t i = 0, j = 0;
-    escrever_flag(&flag);
-    arquivo->conteudo = file_pointer + ARQUIVO_SIZE;
-    escrever(arquivo);
-
-    for (i = 0; i < tamanho; i += DATA_SIZE)
-    {
-        flag.tipo = DATA;
-        escrever_flag(DATA);
-
-        for (j = 0; j < DATA_SIZE; j++)
-        {
-        }
-
-        // escrever_endereco(tamanho - i > 0 ? )
-    }
+    escrever_flags(&flags);
+    escrever_endereco(arquivo->pai);
+    escrever_atributos(arquivo->atributos);
+    escrever_nome(arquivo->nome);
 }

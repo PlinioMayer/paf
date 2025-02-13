@@ -25,7 +25,7 @@ void init_arquivo()
     {
         mem_arquivos = realloc(mem_arquivos, sizeof(mem_arquivo_t *) * (mem_arquivos_count + 1));
         mem_arquivos[mem_arquivos_count] = calloc(1, sizeof(mem_arquivo_t));
-        mem_arquivos[mem_arquivos_count]->endereco = file_pointer - FLAG_SIZE - ARQUIVO_SIZE;
+        mem_arquivos[mem_arquivos_count]->endereco = get_file_pointer() - ARQUIVO_SIZE;
         mem_arquivos[mem_arquivos_count]->arquivo = arquivo;
         mem_arquivos[mem_arquivos_count]->filhos_count = 0;
         mem_arquivos[mem_arquivos_count]->filhos = calloc(mem_arquivos[mem_arquivos_count]->filhos_count, sizeof(mem_arquivo_t *));
@@ -62,6 +62,7 @@ void init_arquivo()
                 min = j;
         }
     }
+    free(mem_arquivos);
 }
 
 void free_arquivo(mem_arquivo_t *mem_arquivo)
@@ -72,6 +73,7 @@ void free_arquivo(mem_arquivo_t *mem_arquivo)
         free_arquivo(mem_arquivo->filhos[i]);
     }
 
+    free(mem_arquivo->arquivo->atributos);
     free(mem_arquivo->arquivo);
     free(mem_arquivo->filhos);
     free(mem_arquivo);
@@ -84,11 +86,11 @@ mem_arquivo_t *add_diretorio(mem_arquivo_t *pai, const char *nome)
 
     strncpy(arquivo->nome, nome, 256);
     arquivo->pai = pai ? pai->endereco : 0;
-    arquivo->diretorio = TRUE;
+    arquivo->atributos = calloc(1, sizeof(atributos_t));
+    arquivo->atributos->diretorio = TRUE;
 
     escrever(arquivo);
-
-    mem_arquivo->endereco = file_pointer - FLAG_SIZE - ARQUIVO_SIZE;
+    mem_arquivo->endereco = get_file_pointer() - ARQUIVO_SIZE;
     mem_arquivo->filhos_count = 0;
     mem_arquivo->arquivo = arquivo;
     mem_arquivo->pai = pai;
@@ -199,67 +201,3 @@ comando_info_t *obter_comando_info(const char *caminho)
 
     return comando_info;
 }
-
-// void print_arquivos()
-// {
-//     int8_t i, j = 0;
-//     for (i = 0; i < 50; i++)
-//     {
-//         printf("#");
-//     }
-
-//     printf("#\n");
-//     printf("#");
-
-//     for (i = 0; i < 49; i++)
-//     {
-//         printf(" ");
-//     }
-
-//     printf("#\n");
-
-//     printf("# nome: %s", root->arquivo->nome);
-
-//     for (j = strlen(root->arquivo->nome); j < 42; j++)
-//     {
-//         printf(" ");
-//     }
-
-//     printf("#\n");
-
-//     for (i = 1; i < arquivos_count; i++)
-//     {
-//         printf("#");
-
-//         for (j = 0; j < 49; j++)
-//         {
-//             printf("-");
-//         }
-
-//         printf("#\n");
-
-//         printf("# pai: %s", arquivos[i]->pai->arquivo->nome);
-
-//         for (j = strlen(arquivos[i]->pai->arquivo->nome); j < 43; j++)
-//         {
-//             printf(" ");
-//         }
-
-//         printf("#\n");
-
-//         printf("# nome: %s", arquivos[i]->arquivo->nome);
-
-//         for (j = strlen(arquivos[i]->arquivo->nome); j < 42; j++)
-//         {
-//             printf(" ");
-//         }
-
-//         printf("#\n");
-//     }
-
-//     for (i = 0; i < 50; i++)
-//     {
-//         printf("#");
-//     }
-//     printf("#\n");
-// }
