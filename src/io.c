@@ -168,7 +168,7 @@ static void clear_buffer()
     uint64_t file_pointer = get_file_pointer();
     fclose(file);
     file = fopen(file_name, "rb+");
-    fseek(file, file_pointer -1, SEEK_SET);
+    fseek(file, file_pointer, SEEK_SET);
 }
 
 void init_io(char *name)
