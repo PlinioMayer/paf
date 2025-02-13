@@ -22,7 +22,8 @@ static flags_t *ler_flags(const uint64_t *endereco)
     {
         flags = calloc(1, sizeof(flags_t));
         flags->lixo = 0;
-        flags->usado = bits & 1;
+        flags->usado = bits & (uint8_t)1;
+        flags->tipo = (bits >> 2) & (uint8_t)1;
     }
 
     if (endereco)
@@ -45,44 +46,82 @@ static void escrever_flags(const uint64_t *endereco, const flags_t *flags)
     if (flags->usado)
         bits += 1;
 
+    if (flags->tipo)
+        bits += 2;
+
     fwrite(&bits, FLAGS_SIZE, 1, file);
 
     if (endereco)
         fseek(file, file_pointer, SEEK_SET);
 }
 
-static uint64_t ler_endereco(const uint64_t *at)
+static uint64_t ler_pai(const uint64_t *endereco)
 {
     uint64_t file_pointer = 0;
-    uint64_t endereco = 0;
+    uint64_t pai = 0;
 
-    if (at)
+    if (endereco)
     {
         file_pointer = get_file_pointer();
-        fseek(file, *at, SEEK_SET);
+        fseek(file, *endereco, SEEK_SET);
     }
 
-    fread(&endereco, ENDERECO_SIZE, 1, file);
+    fread(&pai, PAI_SIZE, 1, file);
 
-    if (at)
+    if (endereco)
         fseek(file, file_pointer, SEEK_SET);
 
-    return endereco;
+    return pai;
 }
 
-static void escrever_endereco(const uint64_t *at, const uint64_t endereco)
+static void escrever_pai(const uint64_t *endereco, const uint64_t pai)
 {
     uint64_t file_pointer = 0;
 
-    if (at)
+    if (endereco)
     {
         file_pointer = get_file_pointer();
-        fseek(file, *at, SEEK_SET);
+        fseek(file, *endereco, SEEK_SET);
     }
 
-    fwrite(&endereco, ENDERECO_SIZE, 1, file);
+    fwrite(&pai, PAI_SIZE, 1, file);
 
-    if (at)
+    if (endereco)
+        fseek(file, file_pointer, SEEK_SET);
+}
+
+static uint64_t ler_tamanho(uint64_t *endereco)
+{
+    uint64_t file_pointer = 0;
+    uint64_t tamanho = 0;
+
+    if (endereco)
+    {
+        file_pointer = get_file_pointer();
+        fseek(file, *endereco, SEEK_SET);
+    }
+
+    fread(&tamanho, TAMANHO_SIZE, 1, file);
+
+    if (endereco)
+        fseek(file, file_pointer, SEEK_SET);
+
+    return tamanho;
+}
+
+static uint64_t escrever_tamanho(uint64_t *endereco, uint64_t tamanho)
+{
+    uint64_t file_pointer = 0;
+
+    if (endereco)
+    {
+        file_pointer = get_file_pointer();
+        fseek(file, *endereco, SEEK_SET);
+    }
+
+    fwrite(&tamanho, PAI_SIZE, 1, file);
+
+    if (endereco)
         fseek(file, file_pointer, SEEK_SET);
 }
 
@@ -207,7 +246,8 @@ arquivo_t *ler_prox_arquivo()
     }
 
     arquivo = calloc(1, sizeof(arquivo_t));
-    arquivo->pai = ler_endereco(NULL);
+    arquivo->pai = ler_pai(NULL);
+    arquivo->tamanho = ler_tamanho(NULL);
     arquivo->atributos = ler_atributos(NULL);
     ler_nome(NULL, arquivo->nome);
 
@@ -216,10 +256,15 @@ arquivo_t *ler_prox_arquivo()
 
 void escrever(const arquivo_t *arquivo)
 {
-    escrever_flags(NULL, &(flags_t){.usado = 1});
-    escrever_endereco(NULL, arquivo->pai);
+    escrever_flags(NULL, &(flags_t){.usado = 1, .tipo = METADATA});
+    escrever_pai(NULL, arquivo->pai);
+    escrever_tamanho(NULL, arquivo->tamanho);
     escrever_atributos(NULL, arquivo->atributos);
     escrever_nome(NULL, arquivo->nome);
+
+    if (arquivo->atributos->tipo == DOCUMENTO)
+        alocar(arquivo->tamanho, NULL);
+
     clear_buffer();
 }
 
@@ -229,4 +274,30 @@ void remover(const uint64_t endereco)
     flags->usado = FALSE;
     escrever_flags(&endereco, flags);
     clear_buffer();
+}
+
+void alocar(const uint64_t tamanho, const uint8_t *conteudo)
+{
+    uint64_t file_pointer = 0;
+    uint64_t i = 0;
+    uint64_t *zeros = NULL;
+
+    if (tamanho)
+        fwrite(conteudo, 1, tamanho, file);
+
+    if (tamanho == DATA_SIZE)
+        return;
+
+    if (tamanho > DATA_SIZE)
+        zeros = calloc((DATA_SIZE + ((tamanho / DATA_SIZE) * DATA_SIZE)) - tamanho, 1);
+    else
+    {
+        printf("%lu\n", DATA_SIZE - tamanho);
+        zeros = calloc(DATA_SIZE - tamanho, 1);
+    }
+
+    printf("hey %lu\n", sizeof(*zeros));
+
+    fwrite(zeros, sizeof(zeros), 1, file);
+    free(zeros);
 }

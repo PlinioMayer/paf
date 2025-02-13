@@ -203,12 +203,37 @@ static void cli_touch(const char *parametros)
 
 static void cli_write(char *parametros)
 {
+    char *conteudo = NULL;
+    comando_info_t *comando_info = NULL;
     char *caminho = obter_parametros(parametros);
-    atributos_t *atributos;
 
     if (!caminho || !strlen(caminho))
     {
         error("informe o caminho do arquivo a ser criado");
+        return;
+    }
+
+    conteudo = obter_parametros(NULL);
+
+    if (!conteudo || !strlen(conteudo))
+    {
+        error("informe o conteudo do arquivo");
+        return;
+    }
+
+    comando_info = obter_comando_info(caminho);
+
+    if (!comando_info)
+    {
+        error("caminho nao encontrado");
+        return;
+    }
+
+    if (!strlen(comando_info->nome))
+    {
+        error("um arquivo chamado /?");
+        free(comando_info->nome);
+        free(comando_info);
         return;
     }
 }
@@ -321,7 +346,7 @@ void init_cli(char *file_name)
 
         if (!strncmp(comando, "write ", 6))
         {
-            cli_touch(comando + 6);
+            cli_write(comando + 6);
             continue;
         }
 
