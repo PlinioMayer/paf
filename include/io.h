@@ -35,5 +35,6 @@ void free_io();
 uint64_t get_file_pointer();
 arquivo_t *ler_prox_arquivo();
 void escrever(const arquivo_t *arquivo);
+void remover(const uint64_t endereco);
 
 #endif // IO_H

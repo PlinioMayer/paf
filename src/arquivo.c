@@ -102,6 +102,20 @@ mem_arquivo_t *add_diretorio(mem_arquivo_t *pai, const char *nome)
     return mem_arquivo;
 }
 
+void remover_arquivo(mem_arquivo_t *mem_arquivo)
+{
+    uint64_t i = 0;
+
+    free(mem_arquivo->arquivo->atributos);
+    free(mem_arquivo->arquivo);
+    remover(mem_arquivo->endereco);
+
+    for (i = 0; i < mem_arquivo->filhos_count; i++)
+        remover_arquivo(mem_arquivo->filhos[i]);
+
+    free(mem_arquivo);
+}
+
 mem_arquivo_t *buscar_filho(const mem_arquivo_t *pai, const char *nome)
 {
     uint64_t i = 0;

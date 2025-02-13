@@ -117,6 +117,18 @@ static void cli_pwd()
     free(caminho_atual);
 }
 
+static void cli_rm(char *parametros)
+{
+    char *caminho = obter_parametros(parametros);
+    mem_arquivo_t *temp_mem_arquivo = buscar_arquivo(caminho);
+
+    if (!temp_mem_arquivo)
+    {
+        error("arquivo nao encontrado");
+        return;
+    }
+}
+
 void init_cli(char *file_name)
 {
     char comando[256];
@@ -191,6 +203,18 @@ void init_cli(char *file_name)
         if (!strcmp(comando, "pwd"))
         {
             cli_pwd();
+            continue;
+        }
+
+        if (!strncmp(comando, "rm ", 3))
+        {
+            cli_rm(comando + 3);
+            continue;
+        }
+
+        if (!strcmp(comando, "cd"))
+        {
+            error("informe o nome do arquivo a ser removido");
             continue;
         }
 

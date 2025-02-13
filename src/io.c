@@ -184,11 +184,14 @@ uint64_t get_file_pointer()
 
 arquivo_t *ler_prox_arquivo()
 {
-    flags_t *flag = NULL;
+    flags_t *flags = NULL;
     arquivo_t *arquivo = NULL;
 
-    if (!(flag = ler_flags(NULL)))
+    if (!(flags = ler_flags(NULL)))
         return NULL;
+
+    if (!flags->usado)
+        return ler_prox_arquivo();
 
     arquivo = calloc(1, sizeof(arquivo_t));
     arquivo->pai = ler_endereco(NULL);
@@ -208,8 +211,9 @@ void escrever(const arquivo_t *arquivo)
     escrever_nome(NULL, arquivo->nome);
 }
 
-void remover(uint64_t endereco)
+void remover(const uint64_t endereco)
 {
-    flags_t *flags;
-    fseek(file, endereco, SEEK_SET);
+    flags_t *flags = ler_flags(&endereco);
+    flags->usado = FALSE;
+    escrever_flags(&endereco, flags);
 }
