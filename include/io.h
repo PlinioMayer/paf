@@ -10,6 +10,12 @@
 #include <stdint.h>
 #include <stdio.h>
 
+typedef enum tipo_arquivo
+{
+    DOCUMENTO = 0,
+    DIRETORIO = 1
+} tipo_arquivo;
+
 typedef struct flags_t
 {
     uint8_t lixo : 7;
@@ -19,7 +25,7 @@ typedef struct flags_t
 typedef struct atributos_t
 {
     uint8_t lixo : 7;
-    boolean diretorio : 1;
+    tipo_arquivo tipo : 1;
 } atributos_t;
 
 typedef struct arquivo_t

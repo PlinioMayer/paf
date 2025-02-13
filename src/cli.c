@@ -44,6 +44,7 @@ static void cli_clear()
 
 static void cli_mkdir(const char *parametros)
 {
+    comando_info_t *comando_info = NULL;
     char *caminho = obter_parametros(parametros);
 
     if (!caminho || !strlen(caminho))
@@ -52,7 +53,7 @@ static void cli_mkdir(const char *parametros)
         return;
     }
 
-    comando_info_t *comando_info = obter_comando_info(caminho);
+    comando_info = obter_comando_info(caminho);
 
     if (!comando_info)
     {
@@ -95,7 +96,7 @@ static void cli_ls(char *parametros)
 
     for (i = 0; i < mem_arquivo->filhos_count; i++)
     {
-        char *tipo = mem_arquivo->filhos[i]->arquivo->atributos->diretorio ? "[diretorio]" : "[ arquivo ]";
+        char *tipo = mem_arquivo->filhos[i]->arquivo->atributos->tipo == DIRETORIO ? "[diretorio]" : "[ arquivo ]";
         printf("%s %s\n", tipo, mem_arquivo->filhos[i]->arquivo->nome);
     }
 }
@@ -111,7 +112,7 @@ static void cli_cd(char *parametros)
         return;
     }
 
-    if (!temp_mem_arquivo->arquivo->atributos->diretorio)
+    if (temp_mem_arquivo->arquivo->atributos->tipo == DOCUMENTO)
     {
         error("arquivo nao e um diretorio");
         return;
@@ -162,8 +163,8 @@ static void cli_rm(char *parametros)
 
 static void cli_touch(const char *parametros)
 {
+    comando_info_t *comando_info = NULL;
     char *caminho = obter_parametros(parametros);
-    atributos_t *atributos;
 
     if (!caminho || !strlen(caminho))
     {
@@ -171,7 +172,7 @@ static void cli_touch(const char *parametros)
         return;
     }
 
-    comando_info_t *comando_info = obter_comando_info(caminho);
+    comando_info = obter_comando_info(caminho);
 
     if (!comando_info)
     {
@@ -195,9 +196,7 @@ static void cli_touch(const char *parametros)
         return;
     }
 
-    atributos = calloc(1, sizeof(atributos_t));
-    atributos->diretorio = FALSE;
-    add_arquivo(comando_info->pai, atributos, comando_info->nome);
+    add_documento(comando_info->pai, comando_info->nome);
     free(comando_info->nome);
     free(comando_info);
 }
