@@ -126,7 +126,7 @@ void remover_arquivo(mem_arquivo_t *mem_arquivo)
     for (i = 0; i < mem_arquivo->filhos_count; i++)
         remover_arquivo(mem_arquivo->filhos[i]);
 
-    for(i = 0; i < mem_arquivo->pai->filhos_count; i++)
+    for (i = 0; i < mem_arquivo->pai->filhos_count; i++)
     {
         if (mem_arquivo->pai->filhos[i] == mem_arquivo)
         {
@@ -135,7 +135,7 @@ void remover_arquivo(mem_arquivo_t *mem_arquivo)
         }
     }
 
-    for(; i < mem_arquivo->pai->filhos_count; i++)
+    for (; i < mem_arquivo->pai->filhos_count; i++)
         mem_arquivo->pai->filhos[i - 1] = mem_arquivo->pai->filhos[i];
 
     mem_arquivo->pai->filhos_count--;
@@ -232,6 +232,8 @@ comando_info_t *obter_comando_info(const char *caminho)
 
         if (!comando_info->pai)
         {
+            free(caminho_pai);
+            free(comando_info);
             return NULL;
         }
 
