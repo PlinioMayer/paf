@@ -102,7 +102,7 @@ static atributos_t *ler_atributos(const uint64_t *endereco)
     {
         atributos = calloc(1, sizeof(atributos_t));
         atributos->lixo = 0;
-        atributos->diretorio = bits & (uint8_t)1;
+        atributos->tipo = bits & (uint8_t)1;
     }
 
     if (endereco)
@@ -122,7 +122,7 @@ static void escrever_atributos(const uint64_t *endereco, const atributos_t *atri
         fseek(file, *endereco, SEEK_SET);
     }
 
-    if (atributos->diretorio)
+    if (atributos->tipo)
         bits += 1;
 
     fwrite(&bits, ATRIBUTOS_SIZE, 1, file);
