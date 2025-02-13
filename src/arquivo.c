@@ -113,6 +113,20 @@ void remover_arquivo(mem_arquivo_t *mem_arquivo)
     for (i = 0; i < mem_arquivo->filhos_count; i++)
         remover_arquivo(mem_arquivo->filhos[i]);
 
+    for(i = 0; i < mem_arquivo->pai->filhos_count; i++)
+    {
+        if (mem_arquivo->pai->filhos[i] == mem_arquivo)
+        {
+            i++;
+            break;
+        }
+    }
+
+    for(; i < mem_arquivo->pai->filhos_count; i++)
+        mem_arquivo->pai->filhos[i - 1] = mem_arquivo->pai->filhos[i];
+
+    mem_arquivo->pai->filhos_count--;
+
     free(mem_arquivo);
 }
 

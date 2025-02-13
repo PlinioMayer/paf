@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include "boolean.h"
 
-FILE *file;
+static char *file_name;
+static FILE *file;
 
 static flags_t *ler_flags(const uint64_t *endereco)
 {
@@ -17,11 +18,11 @@ static flags_t *ler_flags(const uint64_t *endereco)
         fseek(file, *endereco, SEEK_SET);
     }
 
-    if (fread(&bits, FLAG_SIZE, 1, file))
+    if (fread(&bits, FLAGS_SIZE, 1, file))
     {
         flags = calloc(1, sizeof(flags_t));
         flags->lixo = 0;
-        flags->usado = (bits & (uint8_t)2) >> 1;
+        flags->usado = bits & 1;
     }
 
     if (endereco)
@@ -44,7 +45,7 @@ static void escrever_flags(const uint64_t *endereco, const flags_t *flags)
     if (flags->usado)
         bits += 1;
 
-    fwrite(&bits, FLAG_SIZE, 1, file);
+    fwrite(&bits, FLAGS_SIZE, 1, file);
 
     if (endereco)
         fseek(file, file_pointer, SEEK_SET);
@@ -162,8 +163,17 @@ static void escrever_nome(const uint64_t *endereco, const char *nome)
         fseek(file, file_pointer, SEEK_SET);
 }
 
-void init_io(char *file_name)
+static void clear_buffer()
 {
+    uint64_t file_pointer = get_file_pointer();
+    fclose(file);
+    file = fopen(file_name, "rb+");
+    fseek(file, file_pointer -1, SEEK_SET);
+}
+
+void init_io(char *name)
+{
+    file_name = name;
     file = fopen(file_name, "rb+");
 
     if (file == NULL)
@@ -191,7 +201,10 @@ arquivo_t *ler_prox_arquivo()
         return NULL;
 
     if (!flags->usado)
+    {
+        fseek(file, ARQUIVO_SIZE - FLAGS_SIZE - 1, SEEK_CUR);
         return ler_prox_arquivo();
+    }
 
     arquivo = calloc(1, sizeof(arquivo_t));
     arquivo->pai = ler_endereco(NULL);
@@ -203,12 +216,11 @@ arquivo_t *ler_prox_arquivo()
 
 void escrever(const arquivo_t *arquivo)
 {
-    flags_t flags = {.usado = 1};
-
-    escrever_flags(NULL, &flags);
+    escrever_flags(NULL, &(flags_t){.usado = 1});
     escrever_endereco(NULL, arquivo->pai);
     escrever_atributos(NULL, arquivo->atributos);
     escrever_nome(NULL, arquivo->nome);
+    clear_buffer();
 }
 
 void remover(const uint64_t endereco)
@@ -216,4 +228,5 @@ void remover(const uint64_t endereco)
     flags_t *flags = ler_flags(&endereco);
     flags->usado = FALSE;
     escrever_flags(&endereco, flags);
+    clear_buffer();
 }

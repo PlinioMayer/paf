@@ -127,6 +127,8 @@ static void cli_rm(char *parametros)
         error("arquivo nao encontrado");
         return;
     }
+
+    remover_arquivo(temp_mem_arquivo);
 }
 
 void init_cli(char *file_name)
@@ -136,7 +138,7 @@ void init_cli(char *file_name)
 
     init_io(file_name);
     init_arquivo();
-    cli_clear();
+    // cli_clear();
 
     while (1)
     {
@@ -212,7 +214,7 @@ void init_cli(char *file_name)
             continue;
         }
 
-        if (!strcmp(comando, "cd"))
+        if (!strcmp(comando, "rm"))
         {
             error("informe o nome do arquivo a ser removido");
             continue;

@@ -1,10 +1,10 @@
 #ifndef IO_H
 #define IO_H
-#define FLAG_SIZE 1
+#define FLAGS_SIZE 1
 #define ENDERECO_SIZE 8
 #define ATRIBUTOS_SIZE 1
 #define NOME_SIZE 256
-#define ARQUIVO_SIZE (FLAG_SIZE + ENDERECO_SIZE + ATRIBUTOS_SIZE + NOME_SIZE)
+#define ARQUIVO_SIZE (FLAGS_SIZE + ENDERECO_SIZE + ATRIBUTOS_SIZE + NOME_SIZE)
 
 #include "boolean.h"
 #include <stdint.h>
