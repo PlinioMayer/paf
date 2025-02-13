@@ -176,6 +176,18 @@ static void cli_touch(const char *parametros)
     free(comando_info);
 }
 
+static void cli_write(char *parametros)
+{
+    char *caminho = obter_parametros(parametros);
+    atributos_t *atributos;
+
+    if (!caminho || !strlen(caminho))
+    {
+        error("informe o caminho do arquivo a ser criado");
+        return;
+    }
+}
+
 void init_cli(char *file_name)
 {
     char comando[256];
@@ -273,6 +285,18 @@ void init_cli(char *file_name)
         if (!strcmp(comando, "touch"))
         {
             error("informe o nome do arquivo a ser criado");
+            continue;
+        }
+
+        if (!strncmp(comando, "write ", 6))
+        {
+            cli_touch(comando + 6);
+            continue;
+        }
+
+        if (!strcmp(comando, "write"))
+        {
+            error("informe o nome do arquivo e seu conteúdo");
             continue;
         }
 

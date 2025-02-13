@@ -24,6 +24,7 @@ typedef struct atributos_t
 
 typedef struct arquivo_t
 {
+    uint64_t tamanho; // 8 bytes
     uint64_t pai;           // 8 bytes
     atributos_t *atributos; // 1 byte
     char nome[NOME_SIZE];   // 256 bytes
